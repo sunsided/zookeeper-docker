@@ -12,13 +12,11 @@ RUN apt-get update && apt-get install -y wget \
 	&& apt-get autoremove -y \
 	&& rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
-#ENV JAVA_HOME /usr/lib/jvm/java-7-openjdk-amd64
+WORKDIR /opt/zookeeper
+COPY conf/zoo.cfg conf/
 
 EXPOSE 2181 2888 3888
-
-WORKDIR /opt/zookeeper
-
-VOLUME ["/opt/zookeeper/conf", "tmp/zookeeper"]
+VOLUME ["/opt/zookeeper/conf", "/srv"]
 
 ENTRYPOINT ["/opt/zookeeper/bin/zkServer.sh"]
 CMD ["start-foreground"]
