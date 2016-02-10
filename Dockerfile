@@ -1,14 +1,17 @@
-#FROM ubuntu:vivid
-FROM java:openjdk-8-jdk
-MAINTAINER Markus Mayer <widemeadows@gmail.com>
+FROM debian:jessie
 
-ENV ZOOKEEPER_PATH=/zookeeper
+RUN apt-get update && apt-get install -y openjdk-7-jre-headless wget
+RUN wget -q -O - ftp://ftp.fu-berlin.de/unix/www/apache/zookeeper/zookeeper-3.5.1-alpha/zookeeper-3.5.1-alpha.tar.gz | tar -xzf - -C /opt \
+    && mv /opt/zookeeper-3.5.1-alpha /opt/zookeeper \
+    && cp /opt/zookeeper/conf/zoo_sample.cfg /opt/zookeeper/conf/zoo.cfg
 
-COPY bin/zookeeper-setup.sh /tmp/
-RUN /tmp/zookeeper-setup.sh
+ENV JAVA_HOME /usr/lib/jvm/java-7-openjdk-amd64
 
-WORKDIR $ZOOKEEPER_PATH
+EXPOSE 2181 2888 3888
 
-COPY bin/zookeeper-init.sh /usr/local/bin/
+WORKDIR /opt/zookeeper
 
-ENTRYPOINT ["/usr/local/bin/zookeeper-init.sh"]
+VOLUME ["/opt/zookeeper/conf", "tmp/zookeeper"]
+
+ENTRYPOINT ["/opt/zookeeper/bin/zkServer.sh"]
+CMD ["start-foreground"]
